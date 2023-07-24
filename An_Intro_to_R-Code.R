@@ -28,7 +28,7 @@
 
 ######## Cover the Console, the environment and the files folder.
 
-######## Above the console on the latest version of R at DHSC, you will see the version of R used
+######## Above the console on the latest version of R available, you will see the version of R used
 ########    this should be 4.2.1.
 
 ######## Tools < Global Options < General - setting up R Studio setting.
@@ -42,11 +42,6 @@
 ########    R will be a relatively basic language to learn.
 ######## While case-sensitive, it is not hugely "picky" with inputs, it is designed to be easy to use.
 
-######## While base R (the standard version of R) is incredibly useful and useable in its own right,
-########    various packages make it even easier to perform some types of analysis.
-
-######## We will use packages in later sessions, mostly the tidyverse package.
-
 ######## It is worth noting is that R is not "zero-indexed".
 ######## This means that counting does not start from 0, instead it begins from 1.
 
@@ -54,6 +49,34 @@
 ########    for i in range(0, n):
 ########        print(i)
 ########    This would print 0, 1, 2, 3, ..., n-1 in Python
+
+######## While base R (the standard version of R) is incredibly useful and usable in its own right,
+########    various packages make it even easier to perform some types of analysis.
+######## We will use packages in later sessions, mostly the tidyverse package.
+
+# ---------------------------------------------------------
+# Section 1c: Best Practice in R
+# ---------------------------------------------------------
+
+######## When naming objects in R, there are different defined ways of labelling a newly created object
+######## These include,
+########    snake_case - where_underscores_replace_spaces
+########    CamelCase  - whereCapitalsReplaceSpaces
+
+######## Internal consistency is the most important thing - make sure to always
+########    use the same convention for all variable names, and the same convention
+########    for all function names.
+######## As an example, the tidyverse uses snake_case for both variables 
+########    and functions. See https://style.tidyverse.org/syntax.html#object-names
+
+######## When code spans multiple lines, it is best practice to split at sensible points.
+######## It is also best to leave whitespace to make code most readable.
+######## Compare the following examples:
+
+######## mutate(total=sum((data_1+data_2)/data_3,na.rm=TRUE))
+######## mutate(total = sum((data_1 + data_2) / data_4, na.rm = TRUE))
+
+######## Evidently one is better!
 
 # ---------------------------------------------------------
 # Section 2: Variable assignment in R
@@ -77,16 +100,11 @@ print(num_colours_in_rainbow) # Prints 7
 
 num_colours_in_rainbow
 
-######## Assigning a new value to a variable will overwrite the old value:
-
-num_planets_in_solar_system <- 9
-num_planets_in_solar_system # Prints 9
-
 ######## If we want to change a variable that already exists, we can do so.
 ######## For example if the status of something changes:
 
+num_planets_in_solar_system <- 9
 num_planets_in_solar_system <- 8
-num_planets_in_solar_system # Prints 8
 
 ######## This way of assignment is not just when we are using numerical variables!
 
@@ -242,7 +260,11 @@ print(nchar(favourite_colour)) # Prints 5
 ######## Other functions like grep(), gsub(), sprintf() can be very handy, but are a bit more complex.
 
 # ---------------------------------------------------------
-# Section 4: Comparisons
+# Section 4: Comparisons and Operators
+# ---------------------------------------------------------
+
+# ---------------------------------------------------------
+# Section 4a: Equality
 # ---------------------------------------------------------
 
 ######## Basic variables can be compared.
@@ -256,7 +278,11 @@ print("hello" == "goodbye") # Prints FALSE
 print(1 != 1) # Prints FALSE
 print("hello" != "goodbye") # Prints TRUE
 
-######## We also have <, >, <=, >=, which behave expectedly on numerical variables:
+# ---------------------------------------------------------
+# Section 4a: Further Operators
+# ---------------------------------------------------------
+
+######## We also have <, >, <=, >=, which behave as expected on numerical variables:
 
 print(1 > 2) # Prints FALSE
 print(100 <= 100) # Prints TRUE
@@ -267,8 +293,10 @@ print(100 <= 100) # Prints TRUE
 
 print("cat" < "dog") # Prints TRUE
 
-## In addition to the basic data types, we will also look at vectors, lists, and dataframes.
-## (And possibly tibbles in later sessions.)
+######## We all can perform integer division and find remainders
+
+print(7 %% 2)
+print(7 %/% 2)
 
 # ---------------------------------------------------------
 # Section 5: Larger Data Types
@@ -486,31 +514,7 @@ filtered_df <- animal_info_df[cats_and_fish,] #Dataframes are the main way of ha
 ###########################
 
 # ---------------------------------------------------------
-# Section 1: Coding Best Practice
-# ---------------------------------------------------------
-
-######## When naming objects in R, there are different defined ways of labelling a newly created object
-######## These include,
-########    snake_case - where_underscores_replace_spaces
-########    CamelCase  - whereCapitalsReplaceSpaces
-
-######## Internal consistency is the most important thing - make sure to always
-########    use the same convention for all variable names, and the same convention
-########    for all function names.
-######## As an example, the tidyverse uses snake_case for both variables 
-########    and functions. See https://style.tidyverse.org/syntax.html#object-names
-
-######## When code spans multiple lines, it is best practice to split at sensible points.
-######## It is also best to leave whitespace to make code most readable.
-######## Compare the following examples:
-
-######## mutate(total=sum((data_1+data_2)/data_3,na.rm=TRUE))
-######## mutate(total = sum((data_1 + data_2) / data_4, na.rm = TRUE))
-
-######## Evidently one is better!
-
-# ---------------------------------------------------------
-# Section 2: Packages
+# Section 1: Packages
 # ---------------------------------------------------------
 
 ######## When analysing data in R, you will almost always need to import a library.
@@ -535,11 +539,11 @@ install.packages("tidyverse", type = "binary")
 ######## To load/import a library, we run
 
 library(tidyverse)
-packages <- c(tidyverse, ggplot)
+packages <- c(tidyverse, ggplot2)
 library(packages)
 
 # ---------------------------------------------------------
-# Section 3: What is the Tidyverse?
+# Section 2: What is the Tidyverse?
 # ---------------------------------------------------------
 
 ######## Before we start using data, we need to focus on the tidyverse
@@ -557,7 +561,7 @@ library(tidyverse)
 ######## https://tidyverse.org/
 
 # ---------------------------------------------------------
-# Section 4: Importing and Exporting Data
+# Section 3: Importing and Exporting Data
 # ---------------------------------------------------------
 
 ######## Most R projects will usually consist of importing data, (sometimes combining data), 
@@ -568,7 +572,7 @@ library(tidyverse)
 ######## It includes options to import csv, xlsx and other file types
 
 # ---------------------------------------------------------
-# Section 4a: .csv Files and Filepaths
+# Section 3a: .csv Files and Filepaths
 # ---------------------------------------------------------
 
 ######## Let's start with importing the easiest format, a csv.
@@ -603,7 +607,8 @@ setwd(paste0(getwd(), "/R files"))
 
 my_data <- readr::read_csv("filepath/filename.csv")
 
-######## We can also use the with_dir function to temporarily change the directory
+######## Using the withr package's with_dir, we can easily change the wd very easily for just a single use.
+######## I'll give an example in session 5.
 
 with_dir(filepath, my_function)
 
@@ -628,7 +633,7 @@ my_data <- storms
 ########    and so is approaching "oven-ready"
 
 # ---------------------------------------------------------
-# Section 4b: .xls/.xlsx Files
+# Section 3b: .xls/.xlsx Files
 # ---------------------------------------------------------
 
 ######## Often however, you will be using Excel files, most commonly
@@ -648,7 +653,7 @@ readxl::read_xlsx()
 readxl::read_xlsx(readxl_example("datasets.xlsx"))
 
 # ---------------------------------------------------------
-# Section 4c: Data From Other Programming Languages/Software
+# Section 3c: Data From Other Programming Languages/Software
 # ---------------------------------------------------------
 
 ######## Unfortunately the world doesn't just use .csv or .xlsx files :(
@@ -670,7 +675,7 @@ read_dta("mtcars.dta")
 write_dta(mtcars, "mtcars.dta")
 
 # ---------------------------------------------------------
-# Section 4c: Handy Tips
+# Section 3d: Handy Tips
 # ---------------------------------------------------------
 
 ######## Don't import everything
@@ -749,7 +754,7 @@ storms <- storms
 # Section 1: Basic Maths in Analysis
 # ---------------------------------------------------------
 
-######## Theres some basic mathematical functions we can use in R
+######## There are some basic mathematical functions we can use in R
 ######## Note that the $(dollar) sign is use to denote which column of the dataset we want
 
 max(storms$pressure)
@@ -761,8 +766,8 @@ median(storms$wind)
 mean(storms$ts_diameter)
 median(storms$ts_diameter)
 
-mean(storms$ts_diameter, na.rm=TRUE)
-median(storms$ts_diameter, na.rm=TRUE)
+mean(storms$ts_diameter, na.rm = TRUE)
+median(storms$ts_diameter, na.rm = TRUE)
 
 # ---------------------------------------------------------
 # Section 2: dplyr and %>% 
@@ -772,8 +777,10 @@ median(storms$ts_diameter, na.rm=TRUE)
 ######## The shortcut to add a pipe is <ctrl-shift-m>
 ######## We call our dataset, use the pipe %>%, and then call the different functions we want to apply.
 
+######## For those interested, the pipe is from the magrittr package
+
 # ---------------------------------------------------------
-# Section 2a: The select Function
+# Section 2a: select()
 # ---------------------------------------------------------
 
 ######## First off, the Select Function allows us to select specific Columns that we are interested in. 
@@ -792,7 +799,7 @@ storms_dates2 <- storms %>%
   dplyr::select(-lat, -long, -status, -category, -wind, -pressure, -ts_diameter, -hu_diameter)
 
 # ---------------------------------------------------------
-# Section 2b: The rename Function
+# Section 2b: rename()
 # ---------------------------------------------------------
 
 ######## The rename function allows us to rename columns (duh!)
@@ -805,7 +812,7 @@ storms_renamed <- storms %>%
 ######## For example, storms is already sorted chronologically, but lets sort it alphabetically by storm name
 
 # ---------------------------------------------------------
-# Section 2c: The arrange Function
+# Section 2c: arrange()
 # ---------------------------------------------------------
 
 storms_alphabetical <- storms_renamed %>% 
@@ -816,7 +823,7 @@ storms_alphabetical <- storms_renamed %>%
   dplyr::arrange(desc(storm_name))
 
 # ---------------------------------------------------------
-# Section 2d: The filter Function
+# Section 2d: filter()
 # ---------------------------------------------------------
 
 ######## We can use the Filter function to select Rows we are interested in based on a condition. 
@@ -841,7 +848,7 @@ hurricanes_recent <- storms %>%
   dplyr::filter(status == "hurricane")
 
 # ---------------------------------------------------------
-# Section 2e: The mutate Function
+# Section 2e: mutate()
 # ---------------------------------------------------------
 
 ######## The mutate function allows us to add new columns to our dataset. It's most useful when applying a function to that column which we pre-populate the column for you.
@@ -866,11 +873,11 @@ storms_clean_mean <- storms_clean %>%
 storms_clean_mean <-mean(storms_clean$hour)
 
 # ---------------------------------------------------------
-# Section 2f: The group_by and ungroup Functions
+# Section 2f: group_by() and ungroup()
 # ---------------------------------------------------------
 
 ######## Summarise becomes most useful as a function when it is used in conjunction with the group_by and ungroup functions.
-######## These functions allow us to seperate data into groups depending on a specific variable, and then apply functions to these groups.
+######## These functions allow us to separate data into groups depending on a specific variable, and then apply functions to these groups.
 ######## For example, we can get the mean hour which storms occur, grouped by the different type of storms.
 
 storms_clean_mean2 <- storms_clean %>%
@@ -932,118 +939,329 @@ hurricane_summary2 <- hurricane_clean_fix %>%
 # -------------------------
 ###########################
 
+######## Visualisations can be achieved in multiply ways in R.
+######## We can use either base R functions, or use packages.
+######## The tidyverse contains a package that is incredibly useful and easy to learn/use.
+######## This is ggplot2.
+
 library(tidyverse)
-library(ggplot2)
-library(dplyr)
 
 # ---------------------------------------------------------
-# Section 1: Understanding Our Data & Review
+# Section 1: Scatter Plots
 # ---------------------------------------------------------
 
-dt <- storms #Using the standard storms data 
+######## Let's try and understand how the wind and pressure changes in time throughout our data series
 
-str(dt) #Gives us data frame info
+######## We need to quickly clean our data.
+######## Firstly, we'll add a column for the date, then we can group on the status.
 
-first_ever_storm_name <- dt[1,1] #How to extract a cell
+storms_cleaned <- storms %>% 
+  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d"))
 
-storm_names <- dt['name'] #Next 4 lines all achieve the same thing
-storm_names <- dt[1]
-storm_names <- dt[,1]
-storm_names <- dt$name
+######## To use ggplot2, we call the ggplot function which indicates that we are producing a graphic
 
-storm_names <- dt[[1]] #removes column name - v.useful!
+ggplot(storms_cleaned)
 
-storm_names <- dt[1] 
+######## We also will come across the aes() function where we define the variables that we will be using in the plot
 
-unique_list_of_storms <- unique(storm_names)
-number_of_storm_names <- count(unique_list_of_storms) #NB not the same as number of storms! Over the years multiple storms have had the same name
+######## Handily we can use the pipe with this...
+########    ... there is one new operator though!
 
-number_of_storm_names <- count(unique(storm_names)) #In 1 line what we did in two lines above
-number_of_storm_names <- storm_names %>% unique() %>% count() #Same as above using the 'pipe' operator
+######## Let's begin plotting with a scatter plot
+
+graph_storms_scatter <- storms_cleaned %>% 
+  ggplot(aes(x = date, y = pressure)) + 
+  geom_point() 
+
+######## This is quite messy but gives us a plot
+
+storms_cleaned <- storms %>% 
+  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
+  filter(!is.na(pressure)) %>% 
+  group_by(date) %>% 
+  summarise(pressure = mean(pressure)) %>% 
+  ungroup()
+
+graph_storms_scatter <- storms_cleaned %>% 
+  ggplot(aes(x = date, y = pressure)) + 
+  geom_point() 
+
+######## It may be more instructive to reduce the amount of data we have
+
+graph_storms_scatter <- storms_cleaned %>% 
+  filter(
+    date > as.Date("2021-01-01")
+  ) %>% 
+  ggplot(aes(x = date, y = pressure)) + 
+  geom_point() 
+
+######## So we have a plot that is useful
+######## We can also add colour to display another variable
+
+storms_cleaned <- storms %>% 
+  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
+  filter(!is.na(pressure)) %>% 
+  group_by(date, status) %>% 
+  summarise(pressure = mean(pressure)) %>% 
+  ungroup()
+
+graph_storms_scatter <- storms_cleaned %>% 
+  filter(
+    date > as.Date("2021-01-01")
+  ) %>% 
+  ggplot(aes(x = date, y = pressure, colour = status)) + 
+  geom_point() 
+
+######## Similarly the size of the points can be added.
+######## Please note the warning produced by R:
+########    "Using size for a discrete variable is not advised"
+######## This isn't too surprising, how should you quantify a discrete variable.
+
+graph_storms_scatter <- storms_cleaned %>% 
+  filter(
+    date > as.Date("2021-01-01")
+  ) %>% 
+  ggplot(aes(x = date, y = pressure, size = status)) + 
+  geom_point() 
+
+######## Let's stick this all together!
+######## Let's plot the distribution of the storms by lat / long
+########    by category and adding the number of occurrences in our full dataset
+
+storms %>% 
+  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
+  filter(date >= "2021-01-01") %>% 
+  group_by(lat, long, status) %>% 
+  summarise(frequency = n()) %>% 
+  ungroup() %>% 
+  group_by(lat, long) %>% 
+  mutate(status_mode = ifelse(frequency == max(frequency), status, NA)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = long, y = lat, colour = status_mode, size = frequency)) +
+  geom_point()
 
 # ---------------------------------------------------------
-# Section 2: Getting the Data Ready to Plot 
+# Section 2: Bar Charts
 # ---------------------------------------------------------
 
-######## Aim: stacked bar chart, storms since 2000 (inc.), categories shown by colours 
+######## Prepare the data we want to use
 
-ordered_dt <- arrange(dt, desc(category)) #So when I remove duplicates (e.g. all entries of 'Katrina 2005') then the entry I keep is the one with the highest category
+storms_bar <- storms %>% 
+  group_by(year, status) %>% 
+  summarise(frequency = n()) %>% 
+  ungroup()
 
-names_and_years <- ordered_dt[c('name', 'year')] #Since a duplicate isn't just same name, but same name & year (BUT see storm Zeta in 2005/6)
-
-filtered_dt <- ordered_dt[!duplicated(names_and_years),]
-filtered_dt <- subset(filtered_dt, !(name == 'Zeta' & year =='2006')) #Removing the storm which spanned 2005 & 2006
-
-plot_dt <- filter(filtered_dt, filtered_dt$year > 1999)
+######## To produce bar charts, we can use either of:
+########    geom_bar, when data is categorical,
+########    geom_col, when data is continuous
 
 # ---------------------------------------------------------
-# Section 3: A Simple Bar Chart & Corresponding Pie Chart
+# Section 2a: (Discrete) Bar Charts - geom_bar()
 # ---------------------------------------------------------
 
-bar_chart <- ggplot(plot_dt, aes(x = year, fill = factor(category))) + geom_bar() 
-bar_chart <- bar_chart + ggtitle('Atlantic Storms') + xlab("Year") + ylab("Number of Storms") + labs(caption='Data Source: NOAA', fill='Category')
+storms %>% 
+  ggplot(aes(year)) +
+  geom_bar()
 
-pie_chart <- ggplot(plot_dt, aes(x = "", fill = factor(category))) + geom_bar() + coord_polar(theta = "y")
-pie_chart <- pie_chart + geom_text(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5)) + scale_fill_brewer()
-pie_chart <- pie_chart + ggtitle('Atlantic Storm Categories (2000-2015)') + labs(caption='Data Source: NOAA', fill='Category') + theme_void()
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_bar()
 
-######## One advantage of the tidyverse is the ability to add line by line, like a recipe.
-######## We can however combine each of these charts into one block, in a similar way to piping we saw last time.
-######## Note though that we use + instead of %>% when combining ggplot2 elements.
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_bar(stat = "count")
 
-bar_chart <- ggplot(plot_dt, aes(x = year, fill = factor(category))) + 
+######## I personally prefer the final one!
+######## I like that the coder is left to specify greater detail
+########    to reduce the ambiguity
+
+storms %>% 
+  group_by(year) %>% 
+  summarise(frequency = n()) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = year)) + 
+  geom_bar()
+
+######## There's an error here, can you see the issue?
+######## We fix this using 'stat = ""'
+
+storms %>% 
+  group_by(year) %>% 
+  summarise(frequency = n()) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = year, y = frequency)) + 
+  geom_bar(stat = "identity")
+
+######## If we want a horizontal chart, we have the following options:
+
+storms %>% 
+  ggplot(aes(x = year)) + 
   geom_bar() + 
-  ggtitle('Atlantic Storms') + 
-  xlab("Year") + 
-  ylab("Number of Storms") + 
-  labs(caption='Data Source: NOAA', fill='Category')
+  coord_flip()
 
-pie_chart <- ggplot(plot_dt, aes(x = "", fill = factor(category))) + 
-  geom_bar() + 
-  coord_polar(theta = "y") +
-  geom_text(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5)) + 
-  scale_fill_brewer() +
-  ggtitle('Atlantic Storm Categories (2000-2015)') + 
-  labs(caption='Data Source: NOAA', fill='Category') + theme_void()
+storms %>% 
+  ggplot(aes(y = year)) + 
+  geom_bar()
 
-# ---------------------------------------------------------
-# Section 4: More Than 1 Plot/Geom On One Chart!
-# ---------------------------------------------------------
+######## Let's add another variable into the mix
 
-######## Aim: Plotting the path of Hurricane Katrina (2005)
-######## Here, preparing the data is a lot easier and more work is done on the chart
+storms %>% 
+  ggplot(aes(x = year, fill = factor(month))) + # Note the need for this factor
+  geom_bar(stat = "count")
 
-katrina_dt <- filter(dt, name == 'Katrina' & year == '2005')
-plot2_dt <- katrina_dt[order(katrina_dt$month, katrina_dt$day, katrina_dt$hour),] #Not necessary, but helpful to see the order() function
+storms %>% 
+  ggplot(aes(x = year, fill = factor(month))) + 
+  geom_bar(stat = "count", position = "stack")
 
-world_dt <- map_data('state') #Built in data of the edges of all US states
-new_orleans <- data.frame(
-  long = c(-90.0),
-  lat = c(29.6)
-)
+storms %>% 
+  ggplot(aes(x = year, fill = factor(month))) + 
+  geom_bar(stat = "count", position = "dodge")
 
-scatter_plot <- ggplot() + geom_polygon(world_dt, mapping=aes(long, lat, group=group), fill='white')
-scatter_plot <- scatter_plot + geom_point(plot2_dt, mapping = aes(long,lat, size=category, color=as.factor(day)))
-scatter_plot <- scatter_plot + geom_point(new_orleans, mapping = aes(long,lat), shape=3)
-scatter_plot <- scatter_plot + ggtitle('Path of Hurricane Katrina (August 2005)') + xlab("Longitude") + ylab("Latitude") + labs(caption='Data Source: NOAA', size='Category', color='Date') + coord_cartesian(xlim=c(-74, -95), ylim=c(22,38))
-scatter_plot <- scatter_plot + annotate('text', x=-92.5, y=30.2, label='New Orleans')
+storms %>% 
+  ggplot(aes(x = year, fill = factor(month))) + 
+  geom_bar(stat = "count", position = "fill")
 
-######## Uncomment the line below if you get the x-axis in the wrong order (i.e. increasing longitude). Apparently an issue for some who run this code.
-# scatter_plot <- scatter_plot + scale_x_reverse()
+######## Again, I favour using the final three options,
+########    since there is no ambiguity!
 
-######## The chart below is another example of more than one Plot/Geom on one chart
-######## We are plotting a histogram for the storm pressures from our original data overlaid with a 'density' plot
+######## Finally we produce pie charts through this method
 
-density_plot <- ggplot(dt, aes(x= pressure)) + geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 5) #NB ..density.. has been formally deprecated, and you would now write after_stat(density)
-density_plot <- density_plot + geom_density(alpha=.2, fill="#d24dff") #We see some more ways to format, here a new way to refer to colours and 'alpha' or opacity
-density_plot <- density_plot + ggtitle('Distribution of Atlantic Storm Pressures (1975-2015)') + xlab("Pressure (mbar)") + ylab("Density") + labs(caption='Data Source: NOAA')
+storms %>% 
+  filter(year > 2014) %>% 
+  ggplot(aes(x = "", fill = factor(year))) +
+  geom_bar() +
+  coord_polar(theta = "y")
 
 # ---------------------------------------------------------
-# Section 5: How to save your plot
+# Section 2b: (Discrete and Continuous) Bar Charts - geom_col()
+# ---------------------------------------------------------
+
+######## geom_col() is the same as geom_bar(stat = "identity")
+
+storms %>% 
+  group_by(year) %>% summarise(frequency = n()) %>% ungroup() %>% 
+  ggplot(aes(x = year, y = frequency)) +
+  geom_col()
+
+storms %>% 
+  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
+  ggplot(aes(x = year, y = frequency, fill = month)) +
+  geom_col(position = "stack")
+
+storms %>% 
+  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
+  ggplot(aes(x = year, y = frequency, fill = month)) +
+  geom_col(position = "dodge")
+
+storms %>% 
+  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
+  ggplot(aes(x = year, y = frequency, fill = month)) +
+  geom_col(position = "fill")
+
+######## Note that fill = month is different to fill = factor(month).
+######## These are performing different operations, 
+########    and crucially, both are acceptable in geom_col().
+
+# ---------------------------------------------------------
+# Section 3: Histograms and Quantile Plots - geom_histogram() and geom_qq()
+# ---------------------------------------------------------
+
+######## Often, when using statistics, we need to check normality, 
+########    for example if we are about to perform a t-test.
+
+######## These are very similar to geom_bar()
+
+# ---------------------------------------------------------
+# Section 3a: Histograms - geom_histogram()
+# ---------------------------------------------------------
+
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_histogram()
+
+storms %>% 
+  ggplot(aes(x = year, fill = factor(month))) +
+  geom_histogram(position = "dodge")
+
+######## We can change the size of the "bins"
+
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_histogram(binwidth = 10) # ie the bins are for 10 year, a decade
+
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_histogram(bins = 20)
+
+# ---------------------------------------------------------
+# Section 3b: Quantile Plots - geom_qq()
+# ---------------------------------------------------------
+
+storms %>% 
+  ggplot(aes(sample = year)) +
+  geom_qq()
+
+# ---------------------------------------------------------
+# Section 3c: Density Plots - geom_density()
+# ---------------------------------------------------------
+
+storms %>% 
+  ggplot(aes(x = year)) +
+  geom_density()
+
+storms %>% 
+  ggplot(aes(x = year, fill = status)) +
+  geom_density(alpha = 0.1) # alpha is a measure of the opacity of the colour
+
+# ---------------------------------------------------------
+# Section 4: Formatting Graphs
+# ---------------------------------------------------------
+
+######## I often find that my graphs end in places I never expected.
+######## Consequently, it's really important that charts are labelled properly
+######## Not just in the slides you put them into, but also the chart itself!
+######## To do this we can use a couple of functions.
+
+plot_example <- mutate(storms, date = as.Date(paste(year, month, day, sep = "-"))) %>% 
+  ggplot(aes(x = date, fill = status)) +
+  geom_density(alpha = 0.1)
+
+plot_example +
+  labs(
+    title = "Time series of relative frequency of different storm types",
+    subtitle = "Data: United States something or other",
+    caption = paste("Chart produced", as.Date(Sys.time())),
+    x = "Year",
+    y = "Relative Frequency"
+  )
+
+######## We also need to be able to change our axes to better show the types of data
+
+plot_example +
+  scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(labels = scales::percent)
+
+######## Let's combine this all together!
+
+full_plot_example <- storms %>% 
+  ggplot(aes(x = year, fill = status)) +
+  geom_density(alpha = 0.1) +
+  scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Time series of relative frequency of different storm types",
+    subtitle = "Data: United States something or other",
+    caption = paste("Chart produced", as.Date(Sys.time())),
+    x = "Year",
+    y = "Relative Frequency"
+  )
+
+# ---------------------------------------------------------
+# Section 5: Saving Charts
 # ---------------------------------------------------------
 
 ######## Uncomment the line below and paste into console, it'll save in the current directory and you need format in file name
 ######## If you don't specify the plot, it'll just save the last one you produced
 ######## You can also save using RStudio buttons provided, but code may be more convenient
 
-#ggsave(plot = scatter_plot, filename = 'My_great_plot.jpeg', device = 'jpeg')
+ggsave(plot = scatter_plot, filename = 'My_great_plot.jpeg', device = 'jpeg')
