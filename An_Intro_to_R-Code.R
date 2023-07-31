@@ -50,6 +50,10 @@
 ########        print(i)
 ########    This would print 0, 1, 2, 3, ..., n-1 in Python
 
+for (i in 0:5){
+  print(i)
+}
+
 ######## While base R (the standard version of R) is incredibly useful and usable in its own right,
 ########    various packages make it even easier to perform some types of analysis.
 ######## We will use packages in later sessions, mostly the tidyverse package.
@@ -171,16 +175,19 @@ print(1/(3^2) + (5 * 2)) # Same result, but much clearer.
 ######## There also many standard functions:
 
 print(log(10)) 	       # Defaults to the natural log (base e)
-?log
 print(log(10, base=2)) # Base can be declared
 print(sin(pi/2))       # pi is a defined constant
 print(sqrt(9))
 
 print(floor(2.9))       # Rounds down to nearest whole number
-print(ceil(2.1))        # Rounds up to nearest whole number
+print(ceiling(2.1))        # Rounds up to nearest whole number
 print(round(2.4))       # Rounds up or down to nearest whole number
 print(round(2.451515, digits=3))  # Can optionally choose number of decimal places
 print(round(31415, digits=-1))    # Including negative values for e.g. to nearest ten
+
+######## We can also get help on what a function does and needs.
+
+?log
 
 # ---------------------------------------------------------
 # Section 3c: Integer variables
@@ -191,6 +198,7 @@ print(round(31415, digits=-1))    # Including negative values for e.g. to neares
 ######## To do so, write an upper case 'L' after the number.
 
 a <- 2L
+class(a)
 
 ######## Note that division will always output a "numeric", even when the result
 ########    is a whole number:
@@ -241,7 +249,7 @@ favourite_colour <- "orange"
 ######## Use paste() to combine multiple character variables. The 'sep' argument is a string that will
 ########    be inserted between each component. If no 'sep' is given, the default is a space.
 
-favourite_colour_sentence <- paste("My favourite colour is ", favourite_colour, ".", sep = "")
+favourite_colour_sentence <- paste("My favourite colour is ", favourite_colour, ".")
 
 ######## An alternative to the paste function is the paste0 function.
 ######## This is equivalent to the paste function with sep = ""
@@ -255,7 +263,7 @@ print(substr(favourite_colour, 2, 4)) # Prints "ran"
 ######## Use nchar() to get the length of a character variable.
 ######## Do not use length() though since this is for vectors
 
-print(nchar(favourite_colour)) # Prints 5
+print(nchar(favourite_colour)) # Prints 6
 
 ######## Other functions like grep(), gsub(), sprintf() can be very handy, but are a bit more complex.
 
@@ -295,8 +303,8 @@ print("cat" < "dog") # Prints TRUE
 
 ######## We all can perform integer division and find remainders
 
-print(7 %% 2)
-print(7 %/% 2)
+print(7 %% 2)  # prints 1
+print(7 %/% 2) # prints 3
 
 # ---------------------------------------------------------
 # Section 5: Larger Data Types
@@ -314,6 +322,11 @@ planets <- c("mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus",
 numbers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 clock_sounds <- c("tick", "tock", "tick", "tock", "tick", "tock")
 
+######## Note that vectors need to have the same class of data for each entry.
+######## We can default to using strings to cover all datatypes.
+
+house_numbers <- c("1", "2", "3a", "3b", "generic_house_name")
+
 ######## As noted above all basic variables are vectors of length one,
 ########    so the two lines below do the same thing.
 
@@ -323,7 +336,7 @@ sky_colour <- c("blue")
 ######## Sometimes explicit definitions would be tedious to write out. There are some shortcuts:
 
 numbers <- 1:10 # Makes a vector of the numbers from 1 to 10 (inclusive)
-clock_sounds <- rep(c("tick", "tock"), 3) # REPeats the vector c("tick", "tock") 3 times
+clock_sounds <- rep(c("tick", "tock"), 4) # REPeats the vector c("tick", "tock") 3 times
 
 ######## Use length() to check the length of a vector
 
@@ -389,7 +402,7 @@ print(c(1, 2, 3) + c(0, 1)) # Returns an error - neither vector length is a mult
 ######## Making a vector of vectors instead concatenates the vectors:
 
 even_numbers <- c(2, 4, 6)
-odd_numbers <- c(1, 2, 3)
+odd_numbers <- c(1, 3, 5)
 
 all_numbers <- c(odd_numbers, even_numbers)
 
@@ -1244,7 +1257,8 @@ plot_example +
 ######## Let's combine this all together!
 
 full_plot_example <- storms %>% 
-  ggplot(aes(x = year, fill = status)) +
+  mutate(date = as.Date(paste(year, month, day, sep = "-"))) %>% 
+  ggplot(aes(x = date, fill = status)) +
   geom_density(alpha = 0.1) +
   scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
   scale_y_continuous(labels = scales::percent) +
