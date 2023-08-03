@@ -552,8 +552,9 @@ install.packages("tidyverse", type = "binary")
 ######## To load/import a library, we run
 
 library(tidyverse)
-packages <- c(tidyverse, ggplot2)
-library(packages)
+
+packages <- c("tidyverse", "ggplot2")
+lapply(packages, library, character.only = TRUE)
 
 # ---------------------------------------------------------
 # Section 2: What is the Tidyverse?
@@ -603,8 +604,8 @@ readr::read_csv()
 ######## I recommend the tidyverse version because:
 ########    - It is (much) quicker
 ########    - Part of the tidyverse and so works better with other tidyverse functions
-########    - Usually does not struggle with importing column names
-########    - It usually guesses the column types pretty well
+########    - Usually does not struggle with importing column names and types
+########    - It usually guesses the column types pretty well and tends to alert you if there is an issue
 
 ######## Let's import some data
 
@@ -621,11 +622,23 @@ setwd(paste0(getwd(), "/R files"))
 my_data <- readr::read_csv("filepath/filename.csv")
 
 ######## Using the withr package's with_dir, we can easily change the wd very easily for just a single use.
-######## I'll give an example in session 5.
+######## I'll give a further set of examples in session 5.
+
+install.packages("withr")
+library(withr)
 
 with_dir(filepath, my_function)
 
 with_dir(filepath, read_csv("filename.csv"))
+
+######## One brief example
+
+my_filepath <- ""
+my_filename_csv <- "sample.csv"
+
+######## Note that my current working directory is displayed just above the console,
+
+sample_csv <- with_dir(my_filepath, read_csv(my_filename_csv))
 
 ######## Note that the name of the file and the filepath need to be strings!
 
@@ -638,8 +651,9 @@ readr::write_csv()
 
 ######## In practice, we need to specify where and what:
 
-readr::write_csv(dataframe, filepath)
-my_data <- storms
+readr::write_csv(dataframe, filename)
+
+with_dir(my_filepath, write_csv(sample_csv, "sample2.csv"))
 
 ######## Usually csvs are the easiest data sources to use,
 ########    usually, a csv is already processed in some sense
@@ -656,6 +670,8 @@ my_data <- storms
 
 readxl::read_excel()
 
+sample_excel <- with_dir(my_filepath, readxl::read_excel("sample.xlsx"))
+
 ######## This detects the file extension, and calls one of the following:
 
 readxl::read_xls()
@@ -663,7 +679,18 @@ readxl::read_xlsx()
 
 ######## For example, some preloaded data in the readxl package:
 
-readxl::read_xlsx(readxl_example("datasets.xlsx"))
+readxl::read_xlsx(readxl::readxl_example("datasets.xlsx"))
+
+######## A quick example
+
+my_filename_xlsx <- "sample.xlsx"
+
+with_dir(my_filepath, read_excel(my_filename_xlsx))
+with_dir(my_filepath, read_xlsx(my_filename_xlsx))
+
+
+sample_excel <- with_dir(my_filepath, readxl::read_xlsx("sample.xlsx"))
+
 
 # ---------------------------------------------------------
 # Section 3c: Data From Other Programming Languages/Software
@@ -671,6 +698,8 @@ readxl::read_xlsx(readxl_example("datasets.xlsx"))
 
 ######## Unfortunately the world doesn't just use .csv or .xlsx files :(
 ######## Thankfully the haven package (part of the tidyverse) has us covered
+
+library(haven)
 
 ######## SAS data
 
@@ -699,7 +728,7 @@ write_dta(mtcars, "mtcars.dta")
 read_csv(filepath, filename, col_select = c("column_1", "column_2"))
 
 # ---------------------------------------------------------
-# Section 5: Manipulating Data (binding and merging)
+# Section 4: Manipulating Data (binding and merging)
 # ---------------------------------------------------------
 
 ######## We will use the storms dataset, which is contained within the tidyverse
@@ -726,6 +755,9 @@ long_lookup <- mutate(tibble(lat = seq(-90,90,0.1)),lat_label =  case_when(lat <
 
 dplyr::bind_rows()
 dplyr::bind_cols()
+
+######## bind_rows is similar but more forgiving than rbind
+######## bind_cols is not usually a good idea!
 
 ######## For example
 ######## Can you guess what these produce
@@ -760,7 +792,7 @@ storms_lat_labelled_full2 <- dplyr::full_join(storms_lat_long, lat_lookup_filter
 # -------------------------
 ###########################
 
-######## Let's play around with the Storms dataset some more.
+######## Let's play around with the Storms dataset a little more.
 storms <- storms
 
 # ---------------------------------------------------------
