@@ -792,6 +792,8 @@ storms_lat_labelled_full2 <- dplyr::full_join(storms_lat_long, lat_lookup_filter
 # -------------------------
 ###########################
 
+library(tidyverse)
+
 ######## Let's play around with the Storms dataset a little more.
 storms <- storms
 
@@ -808,11 +810,11 @@ min(storms$pressure)
 mean(storms$wind)
 median(storms$wind)
 
-mean(storms$ts_diameter)
-median(storms$ts_diameter)
+mean(storms$tropicalstorm_force_diameter)
+median(storms$tropicalstorm_force_diameter)
 
-mean(storms$ts_diameter, na.rm = TRUE)
-median(storms$ts_diameter, na.rm = TRUE)
+mean(storms$tropicalstorm_force_diameter, na.rm = TRUE)
+median(storms$tropicalstorm_force_diameter, na.rm = TRUE)
 
 # ---------------------------------------------------------
 # Section 2: dplyr and %>% 
@@ -835,13 +837,13 @@ storms_dates <- storms %>%
   dplyr::select(name, year, month, day, hour)
 
 storms_dates_reordered <- storms %>%
-  dplyr::select(name, hour, day, month, year)
+  dplyr::select("name_new" = name, hour, day, month, year)
 
 ######## This can also be achieved by deselecting the columns we are not interested in. To deselect, add a minus sign infront of column name. 
 ######## This can be useful when you have a large dataset with lots of columns, and only want to remove a one or two. 
 
 storms_dates2 <- storms %>%
-  dplyr::select(-lat, -long, -status, -category, -wind, -pressure, -ts_diameter, -hu_diameter)
+  dplyr::select(-lat, -long, -status, -category, -wind, -pressure, -tropicalstorm_force_diameter, -hurricane_force_diameter)
 
 # ---------------------------------------------------------
 # Section 2b: rename()
@@ -856,6 +858,10 @@ storms_renamed <- storms %>%
 ######## The arrange function allows us to sort out dataset by a given column
 ######## For example, storms is already sorted chronologically, but lets sort it alphabetically by storm name
 
+storms_example <- storms %>% 
+  select(name, year, month, day) %>% 
+  rename(storm_name = name)
+
 # ---------------------------------------------------------
 # Section 2c: arrange()
 # ---------------------------------------------------------
@@ -866,6 +872,9 @@ storms_alphabetical <- storms_renamed %>%
 ######## We can arrange it the opposite way wrapping our column in the 'desc' function
 storms_alphabetical <- storms_renamed %>% 
   dplyr::arrange(desc(storm_name))
+
+storms_by_pressure <- storms %>% 
+  arrange(pressure, wind)
 
 # ---------------------------------------------------------
 # Section 2d: filter()
@@ -878,10 +887,10 @@ storms_recent <- storms %>%
   dplyr::filter(year > 2010)
 
 ######## We can also choose what we DON'T want our rows to include, using the exclamation point!
-######## Below, we are filtering our dataset to include all rows that DON'T have an NA value for ts_diameter.
+######## Below, we are filtering our dataset to include all rows that DON'T have an NA value for tropicalstorm_force_diameter.
 
 storms_clean <- storms %>%
-  dplyr::filter(!is.na(ts_diameter))
+  dplyr::filter(!is.na(tropicalstorm_force_diameter))
 
 ######## We can use multiple pipes to apply multiple commands in one step. This can be using the same function or different functions.
 ######## The pipe always comes at the end of your line, as it introduces the next line.
@@ -892,6 +901,15 @@ hurricanes_recent <- storms %>%
   dplyr::filter(year > 2010) %>%
   dplyr::filter(status == "hurricane")
 
+hurricanes_recent2 <- storms %>%
+  dplyr::filter(year > 2010, status == "hurricane")
+
+hurricanes_recent3 <- storms %>%
+  dplyr::filter(year > 2010 & status == "hurricane")
+
+hurricanes_recent4 <- storms %>%
+  dplyr::filter(year > 2010 | status == "hurricane")
+
 # ---------------------------------------------------------
 # Section 2e: mutate()
 # ---------------------------------------------------------
@@ -901,24 +919,49 @@ hurricanes_recent <- storms %>%
 ######## The first element is the name of our new column. We then add our function to calculate whether the column contains 'Daytime' or 'Nightime' based on the value of the hour.
 ######## Reminder that '&' is our symbol for AND, and "|" is our symbol for OR
 
-storms_clean <- storms_clean %>%
+storms_clean1 <- storms_clean %>%
   dplyr::mutate(time = case_when(
-    hour > 6 & hour < 18 ~ "Daytime",
-    hour <= 6 | hour >= 18 ~ "Nightime",
+    hour >= 6 & hour < 18 ~ "Daytime",
+    hour < 6 | hour >= 18 ~ "Nightime",
   ))
+
+######## What happens if we don't meet any of the criteria of a case when?
+######## Automatically a NA will be applied.
+######## An equivalent of "else" is setting a final condition of TRUE, which by definition, will always be met.
+
+storms_clean2 <- storms_clean %>%
+  dplyr::mutate(time = case_when(
+    hour >= 6 & hour < 18 ~ "Daytime",
+    hour < 6 | hour >= 18 ~ "Nightime",
+    TRUE ~ "other"
+  ))
+
+# ---------------------------------------------------------
+# Section 2f: summarise()
+# ---------------------------------------------------------
 
 ######## The summarise function creates a vector or dataset from a specific function applied to the dataset.
 ######## For example here, we can get the mean hour which storms occur by applying the mean function within the summarise function.
 
 storms_clean_mean <- storms_clean %>%
-  dplyr::summarise(mean(hour))
+  dplyr::summarise(hour_mean = mean(hour))
 
-######## However, this hasn't been that useful as a standalone function, because we could have achieved the same output by simply doing:
+######## However, this hasn't been that useful as a standalone function.
+######## We haven't really gained anything with it as a dataframe still
+######## We could have achieved the same output by simply doing:
 
-storms_clean_mean <-mean(storms_clean$hour)
+storms_clean_mean <- mean(storms_clean$hour)
+
+######## We don't just have to summarise one stat!
+
+storms_clean_mean <- storms_clean %>%
+  dplyr::summarise(
+    hour_mean = mean(hour),
+    hour_median = median(hour)
+  )
 
 # ---------------------------------------------------------
-# Section 2f: group_by() and ungroup()
+# Section 2g: group_by() and ungroup()
 # ---------------------------------------------------------
 
 ######## Summarise becomes most useful as a function when it is used in conjunction with the group_by and ungroup functions.
@@ -927,7 +970,7 @@ storms_clean_mean <-mean(storms_clean$hour)
 
 storms_clean_mean2 <- storms_clean %>%
   dplyr::group_by(status)%>%
-  dplyr::summarise(mean(hour))
+  dplyr::summarise(hour_mean = mean(hour))
 
 ######## This has given us a new dataframe that tells us the mean hour storms occur for each of the different storm types.
 
@@ -941,7 +984,22 @@ storms_clean <- storms_clean %>%
   dplyr::ungroup() %>%
   dplyr::mutate(mn_hour = mean(hour))
 
+######## Ungrouping is also useful when finding when comparing things outside the group afterwards.
+storms_clean2 <- storms_clean %>% 
+  group_by(status, time) %>% 
+  summarise(wind_mean = mean(wind)) %>% 
+  ungroup() %>% 
+  group_by(status) %>% 
+  mutate(wind_mean2 = wind_mean / max(wind_mean)) %>% 
+  ungroup()
+
+######## This would find the mean wind speed as a percentage of the highest mean speed for each group.
+
 ######## For best practice, always ungroup your data after grouping as this will reduce the likelihood of errors.
+
+# ---------------------------------------------------------
+# Section 3: The Benefits of %>%ing
+# ---------------------------------------------------------
 
 ######## Let's put this all together to make one chunk of code that does all our cleaning:
 
@@ -952,7 +1010,7 @@ hurricane_clean <- storms %>%
   dplyr::arrange(name) %>% #sort them alphabetically
   dplyr::mutate(time = case_when(
     hour > 6 & hour < 18 ~ "Daytime",
-    hour <= 6 | hour >= 18 ~ "Nightime",)) #add our extra time column
+    hour <= 6 | hour >= 18 ~ "Nightime")) #add our extra time column
 
 ######## I want to know the mean latitude/longitude of each storm 
 ######## Normally, I would simply to the group_by and summarise process as so
