@@ -1049,107 +1049,92 @@ hurricane_summary2 <- hurricane_clean_fix %>%
 
 library(tidyverse)
 
-# ---------------------------------------------------------
-# Section 1: Scatter Plots
-# ---------------------------------------------------------
-
-######## Let's try and understand how the wind and pressure changes in time throughout our data series
-
 ######## We need to quickly clean our data.
 ######## Firstly, we'll add a column for the date, then we can group on the status.
 
 storms_cleaned <- storms %>% 
-  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d"))
+  mutate(
+    date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d"),
+    storm_id = paste(name, year)
+  ) %>% 
+  group_by(storm_id) %>% 
+  mutate(storm_occurrence = row_number()) %>% 
+  ungroup()
+
+# ---------------------------------------------------------
+# Section 1: Line Plots
+# ---------------------------------------------------------
+
+######## Let's start by creating a line graph.
+######## I'll also use some of the skills we've picked up in the last 3 sessions.
+
+unique(storms_cleaned$storm_id)
+
+length(unique(storms_cleaned$storm_id))
+
+######## This is rather a lot of storms to display!
+
+length(unique(filter(storms_cleaned, year == 1975)$storm_id))
+
+######## 8 storms is probably sensible!
+
+storms_line_scatter <- filter(storms_cleaned, year == 1975)
 
 ######## To use ggplot2, we call the ggplot function which indicates that we are producing a graphic
 
-ggplot(storms_cleaned)
+ggplot(storms_line_scatter)
 
 ######## We also will come across the aes() function where we define the variables that we will be using in the plot
 
 ######## Handily we can use the pipe with this...
 ########    ... there is one new operator though!
 
+ggplot(storms_line_scatter) +
+  geom_line(aes(x = storm_occurrence, y = wind, col = storm_id))
+
+ggplot(storms_line_scatter) +
+  geom_line(aes(x = storm_occurrence, y = pressure, col = storm_id))
+
+# ---------------------------------------------------------
+# Section 2: Scatter Plots
+# ---------------------------------------------------------
+
+######## Let's try and understand how the wind and pressure changes in time throughout our data series
+
 ######## Let's begin plotting with a scatter plot
 
-graph_storms_scatter <- storms_cleaned %>% 
-  ggplot(aes(x = date, y = pressure)) + 
+storms_plots %>% 
+  ggplot(aes(x = wind, y = pressure)) + 
   geom_point() 
 
-######## This is quite messy but gives us a plot
-
-storms_cleaned <- storms %>% 
-  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
-  filter(!is.na(pressure)) %>% 
-  group_by(date) %>% 
-  summarise(pressure = mean(pressure)) %>% 
-  ungroup()
-
-graph_storms_scatter <- storms_cleaned %>% 
-  ggplot(aes(x = date, y = pressure)) + 
-  geom_point() 
-
-######## It may be more instructive to reduce the amount of data we have
-
-graph_storms_scatter <- storms_cleaned %>% 
-  filter(
-    date > as.Date("2021-01-01")
-  ) %>% 
-  ggplot(aes(x = date, y = pressure)) + 
-  geom_point() 
-
-######## So we have a plot that is useful
 ######## We can also add colour to display another variable
 
-storms_cleaned <- storms %>% 
-  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
-  filter(!is.na(pressure)) %>% 
-  group_by(date, status) %>% 
-  summarise(pressure = mean(pressure)) %>% 
-  ungroup()
-
-graph_storms_scatter <- storms_cleaned %>% 
-  filter(
-    date > as.Date("2021-01-01")
-  ) %>% 
-  ggplot(aes(x = date, y = pressure, colour = status)) + 
+graph_storms_scatter <- storms_plots %>% 
+  ggplot(aes(x = wind, y = pressure, colour = storm_id)) + 
   geom_point() 
 
+######## Note that this we've saved this graph
+
 ######## Similarly the size of the points can be added.
+storms_plots %>% 
+  ggplot(aes(x = wind, y = pressure, colour = storm_id, size = status)) + 
+  geom_point() 
+
 ######## Please note the warning produced by R:
 ########    "Using size for a discrete variable is not advised"
 ######## This isn't too surprising, how should you quantify a discrete variable.
 
-graph_storms_scatter <- storms_cleaned %>% 
-  filter(
-    date > as.Date("2021-01-01")
-  ) %>% 
-  ggplot(aes(x = date, y = pressure, size = status)) + 
+storms_plots %>% 
+  ggplot(aes(x = wind, y = pressure, colour = storm_id, size = storm_occurrence)) + 
   geom_point() 
 
-######## Let's stick this all together!
-######## Let's plot the distribution of the storms by lat / long
-########    by category and adding the number of occurrences in our full dataset
-
-storms %>% 
-  mutate(date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d")) %>% 
-  filter(date >= "2021-01-01") %>% 
-  group_by(lat, long, status) %>% 
-  summarise(frequency = n()) %>% 
-  ungroup() %>% 
-  group_by(lat, long) %>% 
-  mutate(status_mode = ifelse(frequency == max(frequency), status, NA)) %>% 
-  ungroup() %>% 
-  ggplot(aes(x = long, y = lat, colour = status_mode, size = frequency)) +
-  geom_point()
-
 # ---------------------------------------------------------
-# Section 2: Bar Charts
+# Section 3: Bar Charts
 # ---------------------------------------------------------
 
 ######## Prepare the data we want to use
 
-storms_bar <- storms %>% 
+storms_bar <- storms_cleaned %>% 
   group_by(year, status) %>% 
   summarise(frequency = n()) %>% 
   ungroup()
@@ -1158,19 +1143,21 @@ storms_bar <- storms %>%
 ########    geom_bar, when data is categorical,
 ########    geom_col, when data is continuous
 
+######## The Posit Cheatsheets are especially good for visualisations!
+
 # ---------------------------------------------------------
-# Section 2a: (Discrete) Bar Charts - geom_bar()
+# Section 3a: (Discrete) Bar Charts - geom_bar()
 # ---------------------------------------------------------
 
-storms %>% 
+storms_bar %>% 
   ggplot(aes(year)) +
   geom_bar()
 
-storms %>% 
+storms_bar %>% 
   ggplot(aes(x = year)) +
   geom_bar()
 
-storms %>% 
+storms_bar %>% 
   ggplot(aes(x = year)) +
   geom_bar(stat = "count")
 
@@ -1178,92 +1165,93 @@ storms %>%
 ######## I like that the coder is left to specify greater detail
 ########    to reduce the ambiguity
 
-storms %>% 
-  group_by(year) %>% 
-  summarise(frequency = n()) %>% 
-  ungroup() %>% 
-  ggplot(aes(x = year)) + 
-  geom_bar()
+######## Let's be clear though, what is being shown in the graph
 
 ######## There's an error here, can you see the issue?
-######## We fix this using 'stat = ""'
+######## We fix this using 'stat = ""' and adding in a new parameter to the aes.
 
-storms %>% 
-  group_by(year) %>% 
-  summarise(frequency = n()) %>% 
-  ungroup() %>% 
+storms_bar %>% 
   ggplot(aes(x = year, y = frequency)) + 
   geom_bar(stat = "identity")
 
 ######## If we want a horizontal chart, we have the following options:
 
-storms %>% 
+storms_bar %>% 
   ggplot(aes(x = year)) + 
   geom_bar() + 
   coord_flip()
 
-storms %>% 
+storms_bar %>% 
   ggplot(aes(y = year)) + 
   geom_bar()
 
+######## Using the 'stat = "identity"'
+
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency)) + 
+  geom_bar(stat = "identity") + 
+  coord_flip()
+
+storms_bar %>% 
+  ggplot(aes(x = frequency, y = year)) + 
+  geom_bar(stat = "identity")
+
+######## However the last option won't work! Bear this in mind
+
 ######## Let's add another variable into the mix
 
-storms %>% 
-  ggplot(aes(x = year, fill = factor(month))) + # Note the need for this factor
-  geom_bar(stat = "count")
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) + 
+  geom_bar(stat = "identity")
 
-storms %>% 
-  ggplot(aes(x = year, fill = factor(month))) + 
-  geom_bar(stat = "count", position = "stack")
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) + 
+  geom_bar(stat = "identity", position = "stack")
 
-storms %>% 
-  ggplot(aes(x = year, fill = factor(month))) + 
-  geom_bar(stat = "count", position = "dodge")
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) + 
+  geom_bar(stat = "identity", position = "dodge")
 
-storms %>% 
-  ggplot(aes(x = year, fill = factor(month))) + 
-  geom_bar(stat = "count", position = "fill")
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) + 
+  geom_bar(stat = "identity", position = "fill")
 
 ######## Again, I favour using the final three options,
 ########    since there is no ambiguity!
 
+######## Warning: using the 'fill' parameter, we need to be careful
+########    It can only be a string or a 'factor'.
+########    You can use factor(category) for the storms dataset for example.
+
 ######## Finally we produce pie charts through this method
 
-storms %>% 
+storms_bar %>% 
   filter(year > 2014) %>% 
-  ggplot(aes(x = "", fill = factor(year))) +
-  geom_bar() +
+  ggplot(aes(x = "", y = frequency, fill = factor(year))) +
+  geom_bar(stat = "identity") +
   coord_polar(theta = "y")
 
 # ---------------------------------------------------------
-# Section 2b: (Discrete and Continuous) Bar Charts - geom_col()
+# Section 3b: (Discrete and Continuous) Bar Charts - geom_col()
 # ---------------------------------------------------------
 
 ######## geom_col() is the same as geom_bar(stat = "identity")
 
-storms %>% 
-  group_by(year) %>% summarise(frequency = n()) %>% ungroup() %>% 
+storms_bar %>% 
   ggplot(aes(x = year, y = frequency)) +
   geom_col()
 
-storms %>% 
-  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
-  ggplot(aes(x = year, y = frequency, fill = month)) +
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) +
   geom_col(position = "stack")
 
-storms %>% 
-  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
-  ggplot(aes(x = year, y = frequency, fill = month)) +
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) +
   geom_col(position = "dodge")
 
-storms %>% 
-  group_by(year, month) %>% summarise(frequency = n()) %>% ungroup() %>% 
-  ggplot(aes(x = year, y = frequency, fill = month)) +
+storms_bar %>% 
+  ggplot(aes(x = year, y = frequency, fill = status)) +
   geom_col(position = "fill")
-
-######## Note that fill = month is different to fill = factor(month).
-######## These are performing different operations, 
-########    and crucially, both are acceptable in geom_col().
 
 # ---------------------------------------------------------
 # Section 3: Histograms and Quantile Plots - geom_histogram() and geom_qq()
@@ -1275,7 +1263,7 @@ storms %>%
 ######## These are very similar to geom_bar()
 
 # ---------------------------------------------------------
-# Section 3a: Histograms - geom_histogram()
+# Section 4a: Histograms - geom_histogram()
 # ---------------------------------------------------------
 
 storms %>% 
@@ -1297,7 +1285,7 @@ storms %>%
   geom_histogram(bins = 20)
 
 # ---------------------------------------------------------
-# Section 3b: Quantile Plots - geom_qq()
+# Section 4b: Quantile Plots - geom_qq()
 # ---------------------------------------------------------
 
 storms %>% 
@@ -1305,7 +1293,7 @@ storms %>%
   geom_qq()
 
 # ---------------------------------------------------------
-# Section 3c: Density Plots - geom_density()
+# Section 4c: Density Plots - geom_density()
 # ---------------------------------------------------------
 
 storms %>% 
@@ -1317,7 +1305,7 @@ storms %>%
   geom_density(alpha = 0.1) # alpha is a measure of the opacity of the colour
 
 # ---------------------------------------------------------
-# Section 4: Formatting Graphs
+# Section 5: Formatting Graphs
 # ---------------------------------------------------------
 
 ######## I often find that my graphs end in places I never expected.
