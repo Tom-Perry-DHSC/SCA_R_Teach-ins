@@ -1052,6 +1052,8 @@ library(tidyverse)
 ######## We need to quickly clean our data.
 ######## Firstly, we'll add a column for the date, then we can group on the status.
 
+storms <- storms
+
 storms_cleaned <- storms %>% 
   mutate(
     date = as.Date(paste(year, month, day, sep = "-"), format = "%Y-%m-%d"),
@@ -1062,7 +1064,7 @@ storms_cleaned <- storms %>%
   ungroup()
 
 # ---------------------------------------------------------
-# Section 1: Line Plots
+# Section 1: Line Graphs
 # ---------------------------------------------------------
 
 ######## Let's start by creating a line graph.
@@ -1080,6 +1082,8 @@ length(unique(filter(storms_cleaned, year == 1975)$storm_id))
 
 storms_line_scatter <- filter(storms_cleaned, year == 1975)
 
+# storms_line_scatter <- storms_cleaned %>% filter(year == 1975)
+
 ######## To use ggplot2, we call the ggplot function which indicates that we are producing a graphic
 
 ggplot(storms_line_scatter)
@@ -1096,27 +1100,28 @@ ggplot(storms_line_scatter) +
   geom_line(aes(x = storm_occurrence, y = pressure, col = storm_id))
 
 # ---------------------------------------------------------
-# Section 2: Scatter Plots
+# Section 2: Scatter Graphs
 # ---------------------------------------------------------
 
 ######## Let's try and understand how the wind and pressure changes in time throughout our data series
 
 ######## Let's begin plotting with a scatter plot
 
-storms_plots %>% 
+storms_line_scatter %>% 
   ggplot(aes(x = wind, y = pressure)) + 
   geom_point() 
 
 ######## We can also add colour to display another variable
 
-graph_storms_scatter <- storms_plots %>% 
+graph_storms_scatter <- storms_line_scatter %>% 
   ggplot(aes(x = wind, y = pressure, colour = storm_id)) + 
   geom_point() 
 
 ######## Note that this we've saved this graph
 
 ######## Similarly the size of the points can be added.
-storms_plots %>% 
+
+storms_line_scatter %>% 
   ggplot(aes(x = wind, y = pressure, colour = storm_id, size = status)) + 
   geom_point() 
 
@@ -1124,7 +1129,7 @@ storms_plots %>%
 ########    "Using size for a discrete variable is not advised"
 ######## This isn't too surprising, how should you quantify a discrete variable.
 
-storms_plots %>% 
+storms_line_scatter %>% 
   ggplot(aes(x = wind, y = pressure, colour = storm_id, size = storm_occurrence)) + 
   geom_point() 
 
@@ -1254,7 +1259,7 @@ storms_bar %>%
   geom_col(position = "fill")
 
 # ---------------------------------------------------------
-# Section 3: Histograms and Quantile Plots - geom_histogram() and geom_qq()
+# Section 4: Histograms and Quantile Plots - geom_histogram() and geom_qq()
 # ---------------------------------------------------------
 
 ######## Often, when using statistics, we need to check normality, 
@@ -1302,7 +1307,7 @@ storms %>%
 
 storms %>% 
   ggplot(aes(x = year, fill = status)) +
-  geom_density(alpha = 0.1) # alpha is a measure of the opacity of the colour
+  geom_density(alpha = 0.5) # alpha is a measure of the opacity of the colour
 
 # ---------------------------------------------------------
 # Section 5: Formatting Graphs
@@ -1349,11 +1354,13 @@ full_plot_example <- storms %>%
   )
 
 # ---------------------------------------------------------
-# Section 5: Saving Charts
+# Section 6: Saving Charts
 # ---------------------------------------------------------
 
 ######## Uncomment the line below and paste into console, it'll save in the current directory and you need format in file name
 ######## If you don't specify the plot, it'll just save the last one you produced
 ######## You can also save using RStudio buttons provided, but code may be more convenient
 
-ggsave(plot = scatter_plot, filename = 'My_great_plot.jpeg', device = 'jpeg')
+ggsave(plot = full_plot_example, filename = 'My_great_plot.jpeg', device = 'jpeg')
+
+with_dir(filepath, ggsave())
